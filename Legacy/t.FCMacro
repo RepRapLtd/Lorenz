@@ -1,0 +1,63 @@
+# basic_constructive_solid_geometry.py
+# an example to demonstrate a basic constructive solid geometry with FreeCAD-Python
+# created by charlyoleg on 2013/05/06
+# license: CC BY SA 3.0
+
+FREECADPATH='/usr/lib/freecad/lib' # adapt this path to your system
+
+import sys
+# choose your favorite test to check if you are running with FreeCAD GUI or traditional Python
+freecad_gui = True
+#if not(FREECADPATH in sys.path): # test based on PYTHONPATH
+if not("FreeCAD" in dir()):       # test based on loaded module
+  freecad_gui = False
+print("dbg102: freecad_gui:", freecad_gui)
+
+if not(freecad_gui):
+  print("dbg101: add FREECADPATH to sys.path")
+  sys.path.append(FREECADPATH)
+  import FreeCAD
+
+print("FreeCAD.Version:", FreeCAD.Version())
+#FreeCAD.Console.PrintMessage("Hello from PrintMessage!\n") # avoid using this method because it is not printed in the FreeCAD GUI
+
+import Part
+from FreeCAD import Base
+
+print("dbg111: start building the 3D part")
+
+## basic shapes
+# Box with length=4, width=4, height=4 at origin point (-2,-2,-2)
+mybox1 = Part.makeBox(4,4,4,Base.Vector(-2,-2,-2))
+# Cylinder with radius=2, height=1 at origin point (0,0,2)
+mycyl1 = Part.makeCylinder(2,1,Base.Vector(0,0,2))
+# Cylinder with radius=1, height=9 at origin point (0,0,-3) and direction (0,0,1)
+mycyl2 = Part.makeCylinder(1,9,Base.Vector(0,0,-3),Base.Vector(0,0,1))
+# Cone with radius1=2, radius2=1, height=2 at origin point (0,0,3)
+mycone1 = Part.makeCone(2,1,2,Base.Vector(0,0,3))
+# Sphere with radius=3 at origin point (0,0,0)
+mysphere1 = Part.makeSphere(3,Base.Vector(0,0,0))
+
+## transform
+# duplicate mycyl2
+mycyl3 = mycyl2.copy()
+# rotation of center (0,0,3) of axis (1,0,0) and angle 90 degree
+mycyl3.rotate(Base.Vector(0,0,1.5),Base.Vector(1,0,0),90)
+# translation of vector (0,0,-1.5)
+mycyl3.translate(Base.Vector(0,0,-1.5))
+
+## boolean operations
+myshape = mybox1.common(mysphere1) # intersection of two solids
+myshape = myshape.fuse(mycyl1) # union of two solids
+myshape = myshape.fuse(mycone1)
+myshape = myshape.fuse(mycyl3)
+myshape = myshape.cut(mycyl2) # subtraction of one solid by an other.
+
+
+# view and export your 3D part
+output_stl_file="test_basic_constructive_solid_geometry.stl"
+Part.show(myshape) # works only with FreeCAD GUI, ignore otherwise
+myshape.exportStl(output_stl_file)
+print("output stl file: %s"%(output_stl_file))
+
+print("dbg999: end of script")

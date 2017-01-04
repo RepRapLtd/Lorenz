@@ -1,0 +1,725 @@
+# -*- coding: utf-8 -*-
+ 
+# CloneConvert.FCMacro
+# Cree un clone ou une copie de l'objet ou des objets selectionne(s) et le met e l'echelle de la grandeur choisie
+# utilisation : lancer CloneConvert selectionnez un objet choisissez la grandeur et cliquez sur OK
+# 
+# Creates a clone of one copy the selected object and updates the selected size range
+# use: start CloneConvert select an object choose the size and click OK
+#
+ 
+#OS: Windows Vista                                #OS: Windows 8.1
+#Word size: 32-bit                                #Word size of OS: 64-bit
+#Version: 0.14.3700 (Git)                         #Word size of FreeCAD: 32-bit
+#Branch: releases/FreeCAD-0-14                    #Version: 0.16.5231 (Git)
+#Hash: 32f5aae0a64333ec8d5d160dbc46e690510c8fe1   #Build type: Release
+#Python version: 2.6.2                            #Branch: master
+#Qt version: 4.5.2                                #Hash: 945638c405766faca0e5f4c1611c00151c88a2ff
+#Coin version: 3.1.0                              #Python version: 2.7.8
+#SoQt version: 1.4.1                              #Qt version: 4.8.6
+#OCC version: 6.5.1                               #Coin version: 4.0.0a
+#                                                 #OCC version: 6.8.0.oce-0.17
+#
+ 
+# ver 0.3 31/07/2014 PyQt4 + PySide
+# ver 0.4 25/07/2015 ajout rotation
+# ver 0.5 26/07/2015 correction rotation plusieurs objets Copy
+# ver 0.6 26/01/2016 correction placement avec plusieurs objets Copy
+ 
+__title__ = "CloneConvert"
+__author__ = "mario52"
+__url__     = "http://www.freecadweb.org/index-fr.html"
+__version__ = "00.06"
+__date__    = "26/01/2016"
+ 
+__Comment__ = "This macro creates Copy or Clone of object(s)"
+__Web__ = "http://www.freecadweb.org/"
+__Wiki__ = "http://www.freecadweb.org/wiki/index.php?title=Macro_CloneConvert"
+__Icon__  = "/usr/lib/freecad/Mod/plugins/icons/Macro_CloneConvert.png"
+__IconW__  = "C:/Users/User Name/AppData/Roaming/FreeCAD/Macro_CloneConvert.png"
+__Help__ = "start the macro and follow the instructions"
+__Status__ = "stable"
+__Requires__ = "Alls Freecad"
+__Communication__ = "http://www.freecadweb.org/wiki/index.php?title=User:Mario52"
+ 
+ 
+try:
+    import PyQt4                     # PyQt4
+    from PyQt4 import QtCore, QtGui  # PyQt4
+ 
+except Exception:
+    import PySide                    # PySide
+    from PySide import QtCore, QtGui # PySide
+import Draft, Part, FreeCAD, math, PartGui, FreeCADGui
+from math import sqrt, pi, sin, cos, asin
+from FreeCAD import Base
+from decimal import *
+from Draft import *
+from FreeCAD import Vector, Rotation, Placement, Console
+ 
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    def _fromUtf8(s):
+        return s
+ 
+ 
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig)
+ 
+ 
+global surface     ; surface     = 0.0
+global volume_     ; volume_     = 0.0
+global boundBox_   ; boundBox_   = 0.0
+global boundBoxLX  ; boundBoxLX  = 0.0
+global boundBoxLY  ; boundBoxLY  = 0.0
+global boundBoxLZ  ; boundBoxLZ  = 0.0
+global boundBox_S  ; boundBox_S  = ""
+global uniteM_X    ; uniteM_X    = 1.0
+global uniteM_Y    ; uniteM_Y    = 1.0
+global uniteM_Z    ; uniteM_Z    = 1.0
+global uniteM      ; uniteM      = 1.0
+global uniteMs     ; uniteMs     = "mm"   # default mm
+global placement_X ; placement_X = 0.0
+global placement_Y ; placement_Y = 0.0
+global placement_Z ; placement_Z = 0.0
+global oripl_X     ; oripl_X     = 0.0
+global oripl_Y     ; oripl_Y     = 0.0
+global oripl_Z     ; oripl_Z     = 0.0
+global Yaw_Z       ; Yaw_Z       = 0.0
+global Pitch_Y     ; Pitch_Y     = 0.0
+global Roll_X      ; Roll_X      = 0.0
+ 
+global sel         ; sel         = ""
+global cloneCopy   ; cloneCopy   = 1
+ 
+global a ; a = ""
+class Ui_MainWindow(object):
+ 
+    def __init__(self, MainWindow):
+#        path = FreeCAD.ConfigGet("AppHomePath")
+ 
+        global uniteMs
+ 
+        self.window = MainWindow
+        MainWindow.setObjectName(_fromUtf8("MainWindow"))
+        MainWindow.resize(230, 520)
+        self.centralWidget = QtGui.QWidget(MainWindow)
+        self.centralWidget.setObjectName(_fromUtf8("centralWidget"))
+        self.label = QtGui.QLabel(self.centralWidget)
+        self.label.setGeometry(QtCore.QRect(10, 10, 191, 16))
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
+        self.label.setObjectName(_fromUtf8("label"))
+ 
+        self.groupBox = QtGui.QGroupBox(self.centralWidget)
+        self.groupBox.setGeometry(QtCore.QRect(10, 30, 211, 141))
+        self.groupBox.setObjectName(_fromUtf8("groupBox"))
+ 
+        self.doubleSpinBox = QtGui.QDoubleSpinBox(self.groupBox)
+        self.doubleSpinBox.setGeometry(QtCore.QRect(100, 50, 101, 22))
+        self.doubleSpinBox.setDecimals(7)
+        self.doubleSpinBox.setMinimum(-10000000.0)
+        self.doubleSpinBox.setMaximum(10000000.0)
+        self.doubleSpinBox.setSingleStep(1.0)
+        self.doubleSpinBox.setProperty("value", 0.0)
+        self.doubleSpinBox.setObjectName(_fromUtf8("doubleSpinBox"))
+        self.doubleSpinBox.valueChanged.connect(self.on_doubleSpinBox_valueChanged) #connection doubleSpinBox
+ 
+        self.label_2 = QtGui.QLabel(self.groupBox)
+        self.label_2.setGeometry(QtCore.QRect(10, 50, 91, 16))
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+ 
+        self.label_3 = QtGui.QLabel(self.groupBox)
+        self.label_3.setGeometry(QtCore.QRect(10, 80, 91, 16))
+        self.label_3.setObjectName(_fromUtf8("label_3"))
+ 
+        self.doubleSpinBox_2 = QtGui.QDoubleSpinBox(self.groupBox)
+        self.doubleSpinBox_2.setGeometry(QtCore.QRect(100, 80, 101, 22))
+        self.doubleSpinBox_2.setDecimals(7)
+        self.doubleSpinBox_2.setMinimum(-10000000.0)
+        self.doubleSpinBox_2.setMaximum(10000000.0)
+        self.doubleSpinBox_2.setSingleStep(1.0)
+        self.doubleSpinBox_2.setProperty("value", 0.0)
+        self.doubleSpinBox_2.setObjectName(_fromUtf8("doubleSpinBox_2"))
+        self.doubleSpinBox_2.valueChanged.connect(self.on_doubleSpinBox_2_valueChanged) #connection doubleSpinBox_2
+ 
+        self.doubleSpinBox_3 = QtGui.QDoubleSpinBox(self.groupBox)
+        self.doubleSpinBox_3.setGeometry(QtCore.QRect(100, 110, 101, 22))
+        self.doubleSpinBox_3.setDecimals(7)
+        self.doubleSpinBox_3.setMinimum(-10000000.0)
+        self.doubleSpinBox_3.setMaximum(10000000.0)
+        self.doubleSpinBox_3.setSingleStep(1.0)
+        self.doubleSpinBox_3.setProperty("value", 0.0)
+        self.doubleSpinBox_3.setObjectName(_fromUtf8("doubleSpinBox_3"))
+        self.doubleSpinBox_3.valueChanged.connect(self.on_doubleSpinBox_3_valueChanged) #connection doubleSpinBox_3
+ 
+        self.label_4 = QtGui.QLabel(self.groupBox)
+        self.label_4.setGeometry(QtCore.QRect(10, 110, 91, 16))
+        self.label_4.setObjectName(_fromUtf8("label_4"))
+ 
+        self.radioButton = QtGui.QRadioButton(self.groupBox)
+        self.radioButton.setGeometry(QtCore.QRect(10, 20, 71, 20))
+        self.radioButton.setChecked(True)
+        self.radioButton.setObjectName(_fromUtf8("radioButton"))
+        self.radioButton.setToolTip(_translate("MainWindow", "Create a clone of the object(s)", None))
+        self.radioButton.clicked.connect(self.on_radioButton_clicked)     #connection radioButton mode clone
+ 
+        self.radioButton_2 = QtGui.QRadioButton(self.groupBox)
+        self.radioButton_2.setGeometry(QtCore.QRect(100, 20, 71, 20))
+        self.radioButton_2.setObjectName(_fromUtf8("radioButton_2"))
+        self.radioButton_2.setToolTip(_translate("MainWindow", "Create a copy of the object(s)", None))
+        self.radioButton_2.clicked.connect(self.on_radioButton_2_clicked) #connection radioButton_2 mode copy
+ 
+        self.groupBox_2 = QtGui.QGroupBox(self.centralWidget)
+        self.groupBox_2.setGeometry(QtCore.QRect(10, 300, 211, 51))
+        self.groupBox_2.setObjectName(_fromUtf8("groupBox_2"))
+ 
+        self.comboBox = QtGui.QComboBox(self.groupBox_2)
+        self.comboBox.setGeometry(QtCore.QRect(10, 20, 191, 22))
+        self.comboBox.setMinimumContentsLength(0)
+        self.comboBox.setObjectName(_fromUtf8("comboBox"))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.addItem(_fromUtf8(""))
+        self.comboBox.setToolTip(_translate("MainWindow",u"Select unit. . .", None))
+        QtCore.QObject.connect(self.comboBox, QtCore.SIGNAL("currentIndexChanged(QString)"), self.SIGNAL_comboBox_Changed)
+ 
+        self.groupBox_3 = QtGui.QGroupBox(self.centralWidget)
+        self.groupBox_3.setGeometry(QtCore.QRect(10, 360, 211, 111))
+        self.groupBox_3.setObjectName(_fromUtf8("groupBox_3"))
+ 
+        self.doubleSpinBox_4 = QtGui.QDoubleSpinBox(self.groupBox_3)
+        self.doubleSpinBox_4.setGeometry(QtCore.QRect(100, 20, 101, 22))
+        self.doubleSpinBox_4.setDecimals(7)
+        self.doubleSpinBox_4.setMinimum(-1000000)
+        self.doubleSpinBox_4.setMaximum(1000000.0)
+        self.doubleSpinBox_4.setSingleStep(1.0)
+        self.doubleSpinBox_4.setProperty("value", 1.0)
+        self.doubleSpinBox_4.setObjectName(_fromUtf8("doubleSpinBox_4"))
+        self.doubleSpinBox_4.setToolTip(_translate("MainWindow", "Scale free X multiplied by ...", None))
+        self.doubleSpinBox_4.valueChanged.connect(self.on_doubleSpinBox_4_valueChanged) #connection doubleSpinBox_4
+ 
+        self.doubleSpinBox_5 = QtGui.QDoubleSpinBox(self.groupBox_3)
+        self.doubleSpinBox_5.setGeometry(QtCore.QRect(100, 50, 101, 22))
+        self.doubleSpinBox_5.setDecimals(7)
+        self.doubleSpinBox_5.setMinimum(-1000000)
+        self.doubleSpinBox_5.setMaximum(1000000.0)
+        self.doubleSpinBox_5.setSingleStep(1.0)
+        self.doubleSpinBox_5.setProperty("value", 1.0)
+        self.doubleSpinBox_5.setObjectName(_fromUtf8("doubleSpinBox_5"))
+        self.doubleSpinBox_5.setToolTip(_translate("MainWindow", "Scale free Y multiplied by ...", None))
+        self.doubleSpinBox_5.valueChanged.connect(self.on_doubleSpinBox_5_valueChanged) #connection doubleSpinBox_5
+ 
+        self.doubleSpinBox_6 = QtGui.QDoubleSpinBox(self.groupBox_3)
+        self.doubleSpinBox_6.setGeometry(QtCore.QRect(100, 80, 101, 22))
+        self.doubleSpinBox_6.setDecimals(7)
+        self.doubleSpinBox_6.setMinimum(-1000000)
+        self.doubleSpinBox_6.setMaximum(1000000.0)
+        self.doubleSpinBox_6.setSingleStep(1.0)
+        self.doubleSpinBox_6.setProperty("value", 1.0)
+        self.doubleSpinBox_6.setObjectName(_fromUtf8("doubleSpinBox_6"))
+        self.doubleSpinBox_6.setToolTip(_translate("MainWindow", "Scale free Z multiplied by ...", None))
+        self.doubleSpinBox_6.valueChanged.connect(self.on_doubleSpinBox_6_valueChanged) #connection doubleSpinBox_6
+ 
+        self.label_5 = QtGui.QLabel(self.groupBox_3)
+        self.label_5.setGeometry(QtCore.QRect(10, 20, 53, 16))
+        self.label_5.setObjectName(_fromUtf8("label_5"))
+ 
+        self.label_6 = QtGui.QLabel(self.groupBox_3)
+        self.label_6.setGeometry(QtCore.QRect(10, 50, 53, 16))
+        self.label_6.setObjectName(_fromUtf8("label_6"))
+ 
+        self.label_7 = QtGui.QLabel(self.groupBox_3)
+        self.label_7.setGeometry(QtCore.QRect(10, 80, 53, 16))
+        self.label_7.setObjectName(_fromUtf8("label_7"))
+ 
+        self.pushButton_3 = QtGui.QPushButton(self.groupBox_3)
+        self.pushButton_3.setGeometry(QtCore.QRect(70, 20, 21, 21))
+        self.pushButton_3.setToolTip(_fromUtf8("Align the Scale YZ to X"))
+        self.pushButton_3.setObjectName(_fromUtf8("pushButton_3"))
+        self.pushButton_3.clicked.connect(self.on_pushButton03_clicked) #connection pushButton03 "..." align YZ to X
+ 
+        self.pushButton_2 = QtGui.QPushButton(self.centralWidget)
+        self.pushButton_2.setGeometry(QtCore.QRect(152, 480, 71, 28))
+        self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
+        self.pushButton_2.clicked.connect(self.on_pushButton02_clicked) #connection pushButton02 "Quitter"
+ 
+        self.pushButton_1 = QtGui.QPushButton(self.centralWidget)
+        self.pushButton_1.setGeometry(QtCore.QRect(10, 480, 71, 28))
+        self.pushButton_1.setObjectName(_fromUtf8("pushButton_1"))
+        self.pushButton_1.setStyleSheet("background-color: Base")
+        self.pushButton_1.clicked.connect(self.on_pushButton01_clicked) #connection pushButton01 "OK"
+ 
+        self.pushButton = QtGui.QPushButton(self.centralWidget)
+        self.pushButton.setGeometry(QtCore.QRect(90, 480, 51, 28))
+        self.pushButton.setObjectName(_fromUtf8("pushButton"))
+        self.groupBox_4 = QtGui.QGroupBox(self.centralWidget)
+        self.groupBox_4.setGeometry(QtCore.QRect(10, 180, 211, 111))
+        self.groupBox_4.setObjectName(_fromUtf8("groupBox_4"))
+ 
+        self.doubleSpinBox_7 = QtGui.QDoubleSpinBox(self.groupBox_4)
+        self.doubleSpinBox_7.setGeometry(QtCore.QRect(100, 20, 101, 22))
+        self.doubleSpinBox_7.setDecimals(7)
+        self.doubleSpinBox_7.setMinimum(-360.0)
+        self.doubleSpinBox_7.setMaximum(360.0)
+        self.doubleSpinBox_7.setObjectName(_fromUtf8("doubleSpinBox_7"))
+        self.doubleSpinBox_7.setToolTip(_translate("MainWindow", "Rotation of Yaw ( Axis Z )", None))
+        self.doubleSpinBox_7.valueChanged.connect(self.on_doubleSpinBox_7_valueChanged) #connection doubleSpinBox_7
+ 
+        self.doubleSpinBox_8 = QtGui.QDoubleSpinBox(self.groupBox_4)
+        self.doubleSpinBox_8.setGeometry(QtCore.QRect(100, 50, 101, 22))
+        self.doubleSpinBox_8.setDecimals(7)
+        self.doubleSpinBox_8.setMinimum(-360.0)
+        self.doubleSpinBox_8.setMaximum(360.0)
+        self.doubleSpinBox_8.setObjectName(_fromUtf8("doubleSpinBox_8"))
+        self.doubleSpinBox_8.setToolTip(_translate("MainWindow", "Rotation of Pitch ( Axis Y )", None))
+        self.doubleSpinBox_8.valueChanged.connect(self.on_doubleSpinBox_8_valueChanged) #connection doubleSpinBox_8
+ 
+        self.doubleSpinBox_9 = QtGui.QDoubleSpinBox(self.groupBox_4)
+        self.doubleSpinBox_9.setGeometry(QtCore.QRect(100, 80, 101, 22))
+        self.doubleSpinBox_9.setDecimals(7)
+        self.doubleSpinBox_9.setMinimum(-360.0)
+        self.doubleSpinBox_9.setMaximum(360.0)
+        self.doubleSpinBox_9.setObjectName(_fromUtf8("doubleSpinBox_9"))
+        self.doubleSpinBox_9.setToolTip(_translate("MainWindow", "Rotation of Roll ( Axis X )", None))
+        self.doubleSpinBox_9.valueChanged.connect(self.on_doubleSpinBox_9_valueChanged) #connection doubleSpinBox_9
+ 
+        self.label_8 = QtGui.QLabel(self.groupBox_4)
+        self.label_8.setGeometry(QtCore.QRect(10, 20, 81, 16))
+        self.label_8.setObjectName(_fromUtf8("label_8"))
+ 
+        self.label_9 = QtGui.QLabel(self.groupBox_4)
+        self.label_9.setGeometry(QtCore.QRect(10, 50, 81, 16))
+        self.label_9.setObjectName(_fromUtf8("label_9"))
+ 
+        self.label_10 = QtGui.QLabel(self.groupBox_4)
+        self.label_10.setGeometry(QtCore.QRect(10, 80, 81, 16))
+        self.label_10.setObjectName(_fromUtf8("label_10"))
+ 
+        self.pushButton.clicked.connect(self.on_pushButton00_clicked)   #connection pushButton00 "Reset"
+ 
+        MainWindow.setCentralWidget(self.centralWidget)
+ 
+ 
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+ 
+ 
+    def retranslateUi(self, MainWindow):
+        MainWindow.setWindowTitle(_translate("MainWindow", "CloneConvert", None))
+        try:
+            MainWindow.setWindowFlags(PyQt4.QtCore.Qt.WindowStaysOnTopHint)  # cette fonction met la fenetre en avant
+        except Exception:
+            MainWindow.setWindowFlags(PySide.QtCore.Qt.WindowStaysOnTopHint)  # cette fonction met la fenetre en avant
+        self.label.setText(_translate("MainWindow", "Object converter", None))
+        self.groupBox.setTitle(_translate("MainWindow", "Mode", None))
+ 
+        self.radioButton.setText(_translate("MainWindow", "Clone", None))
+        self.radioButton_2.setText(_translate("MainWindow", "Copy", None))
+ 
+        self.doubleSpinBox.setToolTip(_translate("MainWindow", "Place the new object to the X coordinate ", None))
+        self.doubleSpinBox.setSuffix(_translate("MainWindow", " mm", None))
+        self.label_2.setText(_translate("MainWindow", "Coordinate X", None))
+        self.label_3.setText(_translate("MainWindow", "Coordinate Y", None))
+        self.doubleSpinBox_2.setToolTip(_translate("MainWindow", "Place the new object to the Y coordinate", None))
+        self.doubleSpinBox_2.setSuffix(_translate("MainWindow", " mm", None))
+        self.doubleSpinBox_3.setToolTip(_translate("MainWindow", "Place the new object to the Z coordinate", None))
+        self.doubleSpinBox_3.setSuffix(_translate("MainWindow", " mm", None))
+        self.label_4.setText(_translate("MainWindow", "Coordinate Z", None))
+ 
+ 
+        self.groupBox_2.setTitle(_translate("MainWindow", "Scale predefined", None))
+        self.comboBox.setToolTip(_translate("MainWindow", "Convert your object to . . .", None))
+        self.comboBox.setCurrentIndex(6)
+        self.comboBox.setItemText(0, _translate("MainWindow", "km", None))         #km #        = 1000000
+        self.comboBox.setItemText(1, _translate("MainWindow", "hm", None))         #hm #        = 100000
+        self.comboBox.setItemText(2, _translate("MainWindow", "dam", None))        #dam#        = 10000
+        self.comboBox.setItemText(3, _translate("MainWindow", "m", None))          #m  #        = 1000
+        self.comboBox.setItemText(4, _translate("MainWindow", "dm", None))         #dm #        = 100
+        self.comboBox.setItemText(5, _translate("MainWindow", "cm", None))         #cm #        = 10
+        self.comboBox.setItemText(6, _translate("MainWindow", "mm", None))         #mm #        = 1        #####
+        self.comboBox.setItemText(7, _translate("MainWindow", "µm", None))         #µm # micro  = 0.001
+        self.comboBox.setItemText(8, _translate("MainWindow", "nm", None))         #nm # nano   = 0.000001
+        self.comboBox.setItemText(9, _translate("MainWindow", "inch", None))       #in # inch  pouce    = 25.400
+        self.comboBox.setItemText(10, _translate("MainWindow", "link", None))      #lk # link  chainon  = 201.168
+        self.comboBox.setItemText(11, _translate("MainWindow", "foot", None))      #ft # foot  pied     = 304.800
+        self.comboBox.setItemText(12, _translate("MainWindow", "yard", None))      #yd # yard  verge    = 914.400
+        self.comboBox.setItemText(13, _translate("MainWindow", "perch", None))     #rd # rod ou perch   perche   = 5029.200
+        self.comboBox.setItemText(14, _translate("MainWindow", "chain", None))     #ch # chain chaine   = 20116.800
+        self.comboBox.setItemText(15, _translate("MainWindow", "furlong", None))   #fur# furlong        = 201168
+        self.comboBox.setItemText(16, _translate("MainWindow", "mile", None))      #mi # mile           = 1609344
+        self.comboBox.setItemText(17, _translate("MainWindow", "league", None))    #lea# league lieue   = 4828032
+        self.comboBox.setItemText(18, _translate("MainWindow", "nautique", None))  #nmi# mile nautique  = 1852000
+        self.groupBox_3.setTitle(_translate("MainWindow", "Scale free", None))
+        self.label_5.setText(_translate("MainWindow", "Scale X", None))
+        self.label_6.setText(_translate("MainWindow", "Scale Y", None))
+        self.label_7.setText(_translate("MainWindow", "Scale Z", None))
+        self.pushButton_3.setToolTip(_translate("MainWindow", "Align the YZ scale values to X scale value ", None))
+        self.pushButton_3.setText(_translate("MainWindow", "...", None))
+        self.pushButton_2.setToolTip(_translate("MainWindow", "Quit the macro", None))
+        self.pushButton_2.setText(_translate("MainWindow", "Quit", None))
+        self.pushButton_1.setToolTip(_translate("MainWindow", "Ok for Convert or copy", None))
+        self.pushButton_1.setText(_translate("MainWindow", "Ok", None))
+        self.pushButton.setToolTip(_translate("MainWindow", "Reset", None))
+        self.pushButton.setText(_translate("MainWindow", "Reset", None))
+        self.groupBox_4.setTitle(_translate("MainWindow", "Rotation", None))
+        self.doubleSpinBox_7.setSuffix(_translate("MainWindow", " Deg", None))
+        self.doubleSpinBox_8.setSuffix(_translate("MainWindow", " Deg", None))
+        self.doubleSpinBox_9.setSuffix(_translate("MainWindow", " Deg", None))
+        self.label_8.setText(_translate("MainWindow", "Yaw ( Z )", None))
+        self.label_9.setText(_translate("MainWindow", "Pitch ( Y )", None))
+        self.label_10.setText(_translate("MainWindow", "Roll ( X )", None))
+ 
+    def SIGNAL_comboBox_Changed(self,text):
+        global uniteM_X
+        global uniteM_Y
+        global uniteM_Z
+        global uniteM
+        global uniteMs
+ 
+        try:
+            text = unicode(text, 'ISO-8859-1').encode('UTF-8')  # PyQt4
+        except Exception:
+            text = text.encode('utf-8')                         # PySide
+ 
+        if text == "km":        #        = 1000000
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 1000000.0
+            uniteMs= "km"
+        elif text == "hm":      #        = 100000
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 100000.0
+            uniteMs= "hm"
+        elif text == "dam":     #        = 10000
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 10000.0
+            uniteMs= "dam"
+        elif text == "m":       #        = 1000
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 1000.0
+            uniteMs= "m"
+        elif text == "dm":      #        = 100
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 100.0
+            uniteMs= "dm"
+        elif text == "cm":      #        = 10
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 10.0
+            uniteMs= "cm"
+        elif text == "mm":      #        = 1  ###############################
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 1.0
+            uniteMs= "mm"
+        elif text == "µm":      #        = 1000
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 1.0/1000.0
+            uniteMs= u"µm"
+        elif text == "nm":      #        = 1000000
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 1.0/1000000.0
+            uniteMs= u"nm"
+        elif text == "inch":    # inch   = 25.400
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 25.400
+            uniteMs= "in"
+        elif text == "link":    # link   = 201.168
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 201.168
+            uniteMs= "lk"
+        elif text == "foot":    # foot   = 304.800
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 304.800
+            uniteMs= "ft"
+        elif text == "yard":    # yard   = 914.400
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 914.400
+            uniteMs= "yd"
+        elif text == "perch":   #rd # rod   perche    = 5029.200
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 5029.200
+            uniteMs= "rd"
+        elif text == "chain":   # chain  = 20116.800
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 20116.800
+            uniteMs= "ch"
+        elif text == "furlong": # furlong= 201168
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 201168
+            uniteMs= "fur"
+        elif text == "mile":     # mile   = 1609344
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 1609344
+            uniteMs= "mi"
+        elif text == "league":   # league = 4828032
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 4828032
+            uniteMs= "lea"
+        elif text == "nautique": # nautique = 1852000
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 1852000
+            uniteMs= "nmi"
+        else:                    # mm = 1
+            uniteM = uniteM_X = uniteM_Y = uniteM_Z = 1.0 
+            uniteMs= "mm"
+ 
+        self.doubleSpinBox_4.setProperty("value", uniteM_X)
+        self.doubleSpinBox_5.setProperty("value", uniteM_Y)
+        self.doubleSpinBox_6.setProperty("value", uniteM_Z)
+ 
+    def on_radioButton_clicked(self):                    # if checked then mode clone
+        global cloneCopy
+        cloneCopy = 1
+ 
+    def on_radioButton_2_clicked(self):                  # if checked then mode copy
+        global cloneCopy
+        cloneCopy = 0
+ 
+    def on_doubleSpinBox_valueChanged(self,value):       # doubleSpinbox X
+        global placement_X
+        placement_X = value
+ 
+    def on_doubleSpinBox_2_valueChanged(self,value):     # doubleSpinbox Y 
+        global placement_Y
+        placement_Y = value
+ 
+    def on_doubleSpinBox_3_valueChanged(self,value):     #  doubleSpinbox Z
+        global placement_Z
+        placement_Z = value
+ 
+    def on_doubleSpinBox_4_valueChanged(self,value):     # doubleSpinbox free X
+        global uniteM_X
+        uniteM_X = value
+        if uniteM_X == 0:
+            uniteM_X = 1
+ 
+    def on_doubleSpinBox_5_valueChanged(self,value):     # doubleSpinbox free Y 
+        global uniteM_Y
+        uniteM_Y = value
+        if uniteM_Y == 0:
+            uniteM_Y = 1
+ 
+    def on_doubleSpinBox_6_valueChanged(self,value):     #  doubleSpinbox free Z
+        global uniteM_Z
+        uniteM_Z = value
+        if uniteM_Z == 0:
+            uniteM_Z = 1
+ 
+    def on_doubleSpinBox_7_valueChanged(self,value):     # doubleSpinBox_7  Yaw ( Z )
+        global Yaw_Z
+        Yaw_Z = value
+ 
+    def on_doubleSpinBox_8_valueChanged(self,value):     # doubleSpinBox_8 Pitch ( Y )
+        global Pitch_Y
+        Pitch_Y = value
+ 
+    def on_doubleSpinBox_9_valueChanged(self,value):     # doubleSpinBox_9 Roll ( X )
+        global Roll_X
+        Roll_X = value
+ 
+    def on_pushButton03_clicked(self):                   # Bouton ... (align)
+        global uniteM_X
+        global uniteM_Y
+        global uniteM_Z
+        global uniteM
+        global uniteMs
+        uniteM_Y = uniteM_Z = uniteM_X
+        self.doubleSpinBox_5.setProperty("value", uniteM_X)
+        self.doubleSpinBox_6.setProperty("value", uniteM_X)
+ 
+    def on_pushButton00_clicked(self):                   # Bouton Reset
+        global sel
+        global uniteM_X
+        global uniteM_Y
+        global uniteM_Z
+        global uniteM
+        global uniteMs
+        global placement_X
+        global placement_Y
+        global placement_Z
+        global oripl_X
+        global oripl_Y
+        global oripl_Z
+        global cloneCopy
+        global Yaw_Z
+        global Pitch_Y
+        global Roll_X
+ 
+        sel         = ""
+        oripl_X = oripl_Y = oripl_Z = 0.0
+ 
+        self.pushButton_1.setToolTip(_translate("MainWindow", "Ok for Convert or copy", None))
+        self.pushButton_1.setStyleSheet("background-color: Base")
+ 
+        self.radioButton.setChecked(True)
+        cloneCopy = 1
+ 
+        self.comboBox.setCurrentIndex(6)
+        self.doubleSpinBox.setProperty("value",   0.0)
+        self.doubleSpinBox_2.setProperty("value", 0.0)
+        self.doubleSpinBox_3.setProperty("value", 0.0)
+ 
+        placement_X = placement_Y = placement_Z = 0.0
+ 
+        self.doubleSpinBox_4.setProperty("value", 1.0)
+        self.doubleSpinBox_5.setProperty("value", 1.0)
+        self.doubleSpinBox_6.setProperty("value", 1.0)
+ 
+        self.doubleSpinBox_7.setProperty("value", 0.0)
+        self.doubleSpinBox_8.setProperty("value", 0.0)
+        self.doubleSpinBox_9.setProperty("value", 0.0)
+ 
+        uniteM = uniteM_X = uniteM_Y = uniteM_Z = 1.0
+        uniteMs= "mm"
+        uniteM = 1
+ 
+    def on_pushButton01_clicked(self):                   # Bouton OK
+        global sel
+        global surface
+        global volume_
+        global boundBox
+        global boundBoxLX
+        global boundBoxLY
+        global boundBoxLZ
+        global boundBox_S
+        global uniteM_X
+        global uniteM_Y
+        global uniteM_Z
+        global uniteM
+        global uniteMs
+        global placement_X
+        global placement_Y
+        global placement_Z
+        global oripl_X
+        global oripl_Y
+        global oripl_Z
+        global sel
+        global Yaw_Z
+        global Pitch_Y
+        global Roll_X
+ 
+        sel = FreeCADGui.Selection.getSelection()   
+ 
+        if len(sel) != 0:
+ 
+            self.pushButton_1.setToolTip(_translate("MainWindow", "Ok for Convert or copy", None))
+            self.pushButton_1.setStyleSheet("background-color: Base")
+ 
+             # boundinbox (dimensions hors tout)
+            try:
+                boundBox_ = sel[0].Shape.BoundBox # pour 1 seul objet, (le premier)
+                boundBoxLX = boundBox_.XLength
+                boundBoxLY = boundBox_.YLength
+                boundBoxLZ = boundBox_.ZLength
+            except:
+                boundBox_  = 0.0
+                boundBoxLX = 0.0
+                boundBoxLY = 0.0
+                boundBoxLZ = 0.0
+                boundBox_S = ""
+ 
+             # volume de tous les objets
+            volume_ = 0.0
+            try:
+                for i in range(len(sel)):
+                    volume_ += sel[i].Shape.Volume
+            except:
+                volume_ = 0.0
+ 
+             # surface de tous les objets
+            surface = 0.0
+            try:
+                for i in range(len(sel)):
+                    surface += sel[i].Shape.Area
+            except:
+                surface = 0.0
+ 
+            boundBox_S = "[X: "+str(boundBoxLX)+" mm] x [Y: "+str(boundBoxLY)+" mm] x [Z:"+str(boundBoxLZ)+" mm]"
+            App.Console.PrintMessage("Original boundBox : "+boundBox_S+"\r\n")
+            App.Console.PrintMessage("Original volume_  : "+str(volume_)+" mm3 ("+str(len(sel))+" element(s))"+"\r\n")
+            App.Console.PrintMessage("Original surface  : "+str(surface)+" mm2 ("+str(len(sel))+" element(s))"+"\r\n")
+            App.Console.PrintMessage("- - - - - - - - - -"+"\r\n")
+ 
+            oripl_X = sel[0].Placement.Base[0]
+            oripl_Y = sel[0].Placement.Base[1]
+            oripl_Z = sel[0].Placement.Base[2]
+ 
+            obj = ""
+            if cloneCopy == 1:       # clone ok
+                obj=Draft.clone(sel)
+                mess = "Clone"
+                if len(sel) > 1:     # many object
+                    obj.Placement=App.Placement(App.Vector(placement_X,placement_Y,placement_Z), App.Rotation(Yaw_Z,Pitch_Y,Roll_X), App.Vector(0,0,0))
+                else:                # one objects
+                    obj.Placement=App.Placement(App.Vector(oripl_X + placement_X,oripl_Y + placement_Y,oripl_Z + placement_Z), App.Rotation(Yaw_Z,Pitch_Y,Roll_X), App.Vector(0,0,0))
+                obj.Scale = (uniteM_X, uniteM_Y, uniteM_Z)
+            else:                     # copy ok
+                mess = "Copy "
+                if len(sel) > 1:
+                    for i in range(len(sel)):
+                        obj = Draft.scale(sel[i],delta=App.Vector(uniteM_X, uniteM_Y, uniteM_Z),center=App.Vector(0,0,0),copy=True,legacy=True)
+                        oripl_X = sel[i].Placement.Base[0]
+                        oripl_Y = sel[i].Placement.Base[1]
+                        oripl_Z = sel[i].Placement.Base[2]
+                        obj.Placement=App.Placement(App.Vector(oripl_X + placement_X,oripl_Y + placement_Y,oripl_Z + placement_Z), App.Rotation(Yaw_Z,Pitch_Y,Roll_X), App.Vector(0,0,0))
+                else:
+                    obj = Draft.scale(sel,delta=App.Vector(uniteM_X, uniteM_Y, uniteM_Z),center=App.Vector(0,0,0),copy=True,legacy=True)
+                    obj.Placement=App.Placement(App.Vector(oripl_X + placement_X,oripl_Y + placement_Y,oripl_Z + placement_Z), App.Rotation(Yaw_Z,Pitch_Y,Roll_X), App.Vector(0,0,0))
+ 
+            FreeCAD.ActiveDocument.recompute()
+ 
+             # boundinbox (dimensions hors tout)
+            try:
+                boundBox_ = obj.Shape.BoundBox
+                boundBoxLX = boundBox_.XLength
+                boundBoxLY = boundBox_.YLength
+                boundBoxLZ = boundBox_.ZLength
+            except:
+                boundBox_  = 0.0
+                boundBoxLX = 0.0
+                boundBoxLY = 0.0
+                boundBoxLZ = 0.0
+ 
+             # volume
+            volume_ = 0.0
+            try:
+                volume_ = obj.Shape.Volume
+            except:
+                for i in range(len(obj)):
+                    volume_ += obj[i].Shape.Volume
+ 
+             # surface
+            surface = 0.0
+            try:
+                surface = obj.Shape.Area
+            except:
+                for i in range(len(obj)):
+                    surface += obj[i].Shape.Area
+ 
+            App.Console.PrintMessage("Convert mm in ' "+uniteMs+" ' (1 "+uniteMs+" = "+str(uniteM)+" mm)"+"\r\n")
+            App.Console.PrintMessage(mess + " boundBox_X  : "+str(boundBoxLX)+" mm"+"\r\n")
+            App.Console.PrintMessage(mess + " boundBox_Y  : "+str(boundBoxLY)+" mm"+"\r\n")
+            App.Console.PrintMessage(mess + " boundBox_Z  : "+str(boundBoxLZ)+" mm"+"\r\n")
+            App.Console.PrintMessage(mess + " volume      : "+str(volume_)+" mm3 ("+str(len(sel))+" element(s))"+"\r\n")#
+            App.Console.PrintMessage(mess + " surface     : "+str(surface)+" mm2 ("+str(len(sel))+" element(s))"+"\r\n")#
+            App.Console.PrintMessage("___________________"+"\r\n")
+            self.pushButton_1.setStyleSheet("background-color: green")
+ 
+        else:
+            self.pushButton_1.setStyleSheet("background-color: red")#red
+            self.pushButton_1.setToolTip(_translate("MainWindow", "Not object selected for Convert or copy", None))
+ 
+            FreeCAD.Console.PrintError("Select an object"+"\r\n")   #App.Console.PrintMessage
+            sel = ""
+ 
+    def on_pushButton02_clicked(self):                   # Bouton Quitter
+        App.Console.PrintMessage("End CloneConvert\r\n")
+        self.window.hide()
+ 
+sel = FreeCADGui.Selection.getSelection()   
+ 
+MainWindow = QtGui.QMainWindow()
+ui = Ui_MainWindow(MainWindow)
+ 
+MainWindow.show()

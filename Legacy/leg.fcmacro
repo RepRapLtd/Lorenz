@@ -1,0 +1,129 @@
+
+
+#from FreeCAD import Base
+#import copy
+import FreeCAD, FreeCADGui, Part, Draft, MeshPart, Mesh
+from PyQt4 import QtGui,QtCore
+import math
+App=FreeCAD
+Gui=FreeCADGui
+
+baseName = 'Lorenz'
+doc = FreeCAD.newDocument(baseName)
+
+sin30 = 0.5;
+sin60 = math.sqrt(3)*0.5;
+cos30 = sin60 #Makes code easier to read
+cos60 = sin30
+pegFit = 0.3
+
+#QT callbacks
+def proceed():
+    try:
+        #S = Strut()
+        #S.solid()
+        #result = doc.addObject('Part::Feature','strut')
+        #result.Shape = S.solid().Shape
+        #doc.addObject(S.solid(),baseName)
+        #doc.recompute()
+        cylinder = Part.makeCylinder()
+        cube = Part.makeBox(2*s,2*s,l+2)
+        difference(cube,cylinder)
+        Gui.SendMsgToActiveView("ViewFit")
+        doc.recompute()
+
+    except:
+        hide()
+        QtGui.qApp.restoreOverrideCursor()
+
+def hide():
+    dialog.hide()
+
+
+def difference(a, b):
+ result = doc.addObject("Part::Cut",baseName)
+ result.Base = a
+ result.Tool = b
+ return result
+
+def mirror(a, vector, origin):
+ result = doc.addObject("Part::Mirroring", baseName)
+ result.Source = a
+ result.Normal = vector
+ result.Base = origin
+ a.ViewObject.Visibility=False
+ return result
+
+def mirrorX(a):
+ return mirror(a, (1,0,0), (0,0,0))
+
+def mirrorY(a):
+ return mirror(a, (0,1,0), (0,0,0))
+
+def mirrorZ(a):
+ return mirror(a, (0,0,1), (0,0,0))
+
+def extrude(polygon, axis):
+ r1 = Part.makePolygon(polygon)
+ rFace = Part.Face(r1)
+ result = doc.addObject('Part::Feature', baseName)
+ result.Shape = rFace.extrude(axis)
+ return result
+
+def translate(a, vector):
+ b = a.Shape.copy()
+ b.translate(vector)
+ result = doc.addObject('Part::Feature',baseName)
+ result.Shape = b
+ a.ViewObject.Visibility=False
+ return result
+
+def vc(v):
+ return Base.Vector(v.x, v.y, v.z)
+
+# Equilateral prism, centre Z axis
+
+class Strut():
+ def __init__(self): 
+  self.side = float(l1.text())
+  self.length = float(l2.text())
+
+ def prism(self, s, l):
+  cylinder = Part.makeCylinder()
+  cube = Part.makeBox(2*s,2*s,l+2)
+  return difference(cube,cylinder)
+
+ def solid(self):
+	return prism(self, self.side, self.length)
+    
+
+# show dialog
+dialog = QtGui.QDialog()
+dialog.resize(200,450)
+dialog.setWindowTitle("Strut")
+la = QtGui.QVBoxLayout(dialog)
+t1 = QtGui.QLabel("Side")
+la.addWidget(t1)
+l1 = QtGui.QLineEdit()
+l1.setText("40")
+la.addWidget(l1)
+t2 = QtGui.QLabel("Length")
+la.addWidget(t2)
+l2 = QtGui.QLineEdit()
+l2.setText("100")
+la.addWidget(l2)
+
+
+okbox = QtGui.QDialogButtonBox(dialog)
+okbox.setOrientation(QtCore.Qt.Horizontal)
+okbox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+la.addWidget(okbox)
+QtCore.QObject.connect(okbox, QtCore.SIGNAL("accepted()"), proceed)
+QtCore.QObject.connect(okbox, QtCore.SIGNAL("rejected()"), hide)
+QtCore.QMetaObject.connectSlotsByName(dialog)
+dialog.show()
+
+
+Gui.SendMsgToActiveView("ViewFit")
+doc.recompute()
+

@@ -1,0 +1,180 @@
+import Part
+import math
+from FreeCAD import Base
+
+baseName = 'Lorenz'
+doc = FreeCAD.newDocument(baseName)
+
+sin30 = 0.5;
+sin60 = math.sqrt(3)*0.5;
+cos30 = sin60 #Makes code easier to read
+cos60 = sin30
+pegFit = 0.3
+
+
+def mirror(a, vector, origin):
+ b = doc.addObject('Part::Feature', baseName)
+ b.Shape = a
+ result = doc.addObject("Part::Mirroring", baseName)
+ result.Source = b
+ result.Normal = vector
+ result.Base = origin
+ b.ViewObject.Visibility=False
+ result.ViewObject.Visibility=False
+ return result.Shape
+
+def mirrorX(a):
+ return mirror(a, (1,0,0), (0,0,0))
+
+def mirrorY(a):
+ return mirror(a, (0,1,0), (0,0,0))
+
+def mirrorZ(a):
+ return mirror(a, (0,0,1), (0,0,0))
+
+def vc(v):
+ return Base.Vector(v.x, v.y, v.z)
+
+def extrude(p, v):
+ result = Part.makePolygon(p)
+ result = Part.Face(result)
+ return result.extrude(v)
+
+def strutHole(length, width, land, thickness, topCorner, rightCorner, bottomCorner, angle):
+ s = math.sin(angle)
+ c = math.cos(angle)
+ q = topCorner.add(Base.Vector(c, s, 0).multiply(-thickness))
+ y = q.y + c*(q.x - thickness)/s
+
+ a = topCorner.sub(rightCorner)
+ a.normalize()
+ b = bottomCorner.sub(rightCorner)
+ f = rightCorner.add(b.multiply(0.5))
+ b.normalize()
+ d = a.add(b)
+ d.normalize()
+ c = Base.Vector(0, 0, 0).sub(bottomCorner)
+ c.normalize()
+ e = c.sub(b)
+ e.normalize()
+
+ g = Base.Vector(b.y, -b.x, 0)
+
+ corners = [
+  Base.Vector(thickness, thickness, 0),
+  Base.Vector(thickness, y, 0),
+  rightCorner.add(d.multiply(thickness)),
+  bottomCorner.add(e.multiply(thickness)),
+  Base.Vector(thickness, thickness, 0)
+  ]
+ voidPart = extrude(corners, Base.Vector(0,0,length))
+ b1 = vc(b)
+ b1.multiply(10*thickness)
+ b2 = vc(b)
+ b2.multiply(-10*thickness)
+ h = bottomCorner.add(b1)
+ i = rightCorner.add(b2)
+ g1 = vc(g)
+ g1.multiply(-10*thickness)
+ corners2 = [
+  h,
+  i,
+  i.add(g1),
+  h.add(g1),
+  h
+  ]
+ g2 = vc(g)
+ g2.multiply(2*thickness)
+ cut1 = extrude(corners2, Base.Vector(0,0,length+10))
+ cut1.translate(g2.add(Base.Vector(0,0,-5)))
+ return voidPart.cut(cut1)
+
+def strutCorners(width, land, rulerDepth, rulerThickness):
+ return [
+  Base.Vector(-width/2,0,0),
+  Base.Vector(-width/2-land*cos60,land*sin60,0),
+  Base.Vector(-land*0.5,land*sin60+width*cos30-land*0.5,0),
+  Base.Vector(-rulerThickness*0.5,land*sin60+width*cos30-land*0.5,0),
+  Base.Vector(-rulerThickness*0.5,land*sin60+width*cos30-rulerDepth,0),
+  Base.Vector(rulerThickness*0.5,land*sin60+width*cos30-rulerDepth,0),
+  Base.Vector(rulerThickness*0.5,land*sin60+width*cos30-land*0.5,0),
+  Base.Vector(land*0.5,land*sin60+width*cos30-land*0.5,0),
+  Base.Vector(width/2+land*cos60,land*sin60,0),
+  Base.Vector(width/2,0,0),
+  Base.Vector(-width/2,0,0)
+  ]
+
+def strut(length, width, land, rulerDepth, rulerThickness, thickness, indent):
+ corners = strutCorners(width, land, rulerDepth, rulerThickness)
+ angle = math.atan((corners[8].x - corners[7].x)/(corners[7].y - corners[8].y))
+
+ result = extrude(corners, Base.Vector(0,0,length))
+
+ hole = strutHole(length+10, width, land, 2*thickness, corners[7], corners[8], corners[9], angle)
+ hole.translate(Base.Vector(0,0,-1))
+ result = result.cut(hole)
+
+ hole1 = mirrorX(hole)
+ result = result.cut(hole1)
+
+ hole2 = strutHole(indent+1, width, land, thickness, corners[7], corners[8], corners[9], angle)
+ hole2.translate(Base.Vector(0,0,-1))
+ result = result.cut(hole2)
+
+ hole3 = mirrorX(hole2)
+ result = result.cut(hole3)
+
+ hole4 = hole2.copy()
+ hole4.translate(Base.Vector(0,0,length-indent+1))
+ result = result.cut(hole4)
+
+ hole5 = mirrorX(hole4)
+ result = result.cut(hole5)
+
+ t0 = vc(corners[9])
+ t0 = t0.add(Base.Vector(land*cos60/3,land*sin60/3,0))
+ t0 = t0.add(Base.Vector(-thickness*sin60,thickness*cos60,0))
+ t1 = vc(t0)
+ t1 = t1.add(Base.Vector(land*cos60/3,land*sin60/3,0))
+ t2 = vc(t0)
+ t2 = t2.add(t1)
+ t2 = t2.multiply(0.5)
+ t2.add(Base.Vector(thickness*sin60*3,-thickness*cos60*3,0))
+
+ corners1 = [t0, t1, t2, vc(t0)]
+ print corners1
+
+ hole6 = extrude(corners1, Base.Vector(0,0,0.5*indent+1))
+ hole6.translate(Base.Vector(0,0,-1))
+
+ result = result.cut(hole6)
+
+ return result
+
+def peg(width, land, rulerDepth, rulerThickness, thickness, indent):
+ corners = strutCorners(width, land, rulerDepth, rulerThickness)
+ angle = math.atan((corners[8].x - corners[7].x)/(corners[7].y - corners[8].y))
+
+ hole = strutHole(indent+10, width, land, 2*thickness, corners[7], corners[8], corners[9], angle)
+ hole.translate(Base.Vector(width,0,-5))
+
+ result = strutHole(indent, width, land, thickness, corners[7], corners[8], corners[9], angle)
+ result.translate(Base.Vector(width,0,0))
+ result = result.cut(hole)
+ return result
+
+length=100
+width=45
+land=6
+rulerDepth=26.36
+rulerThickness=0.63
+thickness=2.5
+indent=10
+st = strut(length, width, land, rulerDepth, rulerThickness, thickness, indent)
+pg = peg(width, land, rulerDepth, rulerThickness, thickness, 2*indent-pegFit)
+#st = strut(100.0, 30, 4.0, 15, 0.63, 2.5, 10)
+Part.show(st)
+Part.show(pg)
+doc.recompute()
+Gui.SendMsgToActiveView("ViewFit")
+
