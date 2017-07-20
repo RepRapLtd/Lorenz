@@ -3,6 +3,10 @@ Delta RepRap
 
 This is a delta RepRap design named after Konrad Lorenz.
 
+See also the RepRap Lorenz Facebook group:
+
+    https://www.facebook.com/groups/1760884507273658/
+
 There is nothing majorly innovative about it, but it was designed with the following in mind:
 
 1. Few trailing wires - they are buried in the prints wherever possible,
