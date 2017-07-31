@@ -1,0 +1,1500 @@
+  0
+SECTION
+  2
+HEADER
+  9
+$ACADVER
+  1
+AC1009
+  9
+$INSBASE
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  9
+$EXTMIN
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  9
+$EXTMAX
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+ENDSEC
+  0
+SECTION
+  2
+TABLES
+  0
+TABLE
+  2
+VPORT
+ 70
+0
+  0
+ENDTAB
+  0
+TABLE
+  2
+LTYPE
+ 70
+1
+  0
+LTYPE
+  2
+CONTINUOUS
+ 70
+0
+  3
+Solid line
+ 72
+65
+ 73
+0
+ 40
+0.0
+  0
+ENDTAB
+  0
+TABLE
+  2
+LAYER
+ 70
+1
+  0
+LAYER
+  2
+0
+ 70
+64
+ 62
+7
+  6
+continuous
+  0
+ENDTAB
+  0
+TABLE
+  2
+STYLE
+ 70
+1
+  0
+STYLE
+  2
+STANDARD
+ 70
+0
+ 40
+0
+ 41
+1.0
+ 50
+0.0
+ 71
+0
+ 42
+1
+ 3
+ARIAL.TTF
+ 4
+
+  0
+ENDTAB
+  0
+TABLE
+  2
+VIEW
+ 70
+0
+  0
+ENDTAB
+  0
+ENDSEC
+  0
+SECTION
+  2
+BLOCKS
+  0
+BLOCK
+  8
+Delta-slider-ball-sockets-hot-end
+  2
+PART__FEATURE121_CS
+ 70
+0
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  3
+PART__FEATURE121_CS
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-133.302224428
+ 20
+15.0401285637
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-134.102224428
+ 20
+15.502008779
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-136.703779947
+ 20
+14.0
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-138.5
+ 20
+14.0
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-139.5
+ 20
+15.0
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-146.5
+ 20
+15.0
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-151.0
+ 20
+10.5
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-151.0
+ 20
+-10.5
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-146.5
+ 20
+-15.0
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-139.5
+ 20
+-15.0
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-138.5
+ 20
+-14.0
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-136.703779947
+ 20
+-14.0
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-123.772465679
+ 20
+-21.4658977734
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-122.874355653
+ 20
+-23.02146997
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-123.240381057
+ 20
+-24.3874953738
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-119.740381057
+ 20
+-30.4496732003
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-113.59326674
+ 20
+-32.0967875173
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-95.4067332602
+ 20
+-21.5967875173
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-93.7596189432
+ 20
+-15.4496732003
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-97.2596189432
+ 20
+-9.38749537377
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-98.625644347
+ 20
+-9.02146996999
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-99.5237543735
+ 20
+-7.46589777341
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-99.5237543735
+ 20
+7.46589777345
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-98.625644347
+ 20
+9.02146997003
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-97.2596189432
+ 20
+9.38749537382
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-93.7596189433
+ 20
+15.4496732003
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-95.4067332603
+ 20
+21.5967875173
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-113.59326674
+ 20
+32.0967875173
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-119.740381057
+ 20
+30.4496732003
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-123.240381057
+ 20
+24.3874953738
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-122.874355653
+ 20
+23.02146997
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-123.772465679
+ 20
+21.4658977734
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-133.302224428
+ 20
+15.9638889944
+ 30
+-148.195
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-107.200961894
+ 20
+20.6685842871
+ 30
+-148.195
+ 42
+1.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-109.799038106
+ 20
+19.1685842871
+ 30
+-148.195
+ 42
+1.0
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-115.785254038
+ 20
+27.3001541475
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-118.535254038
+ 20
+22.5370144266
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-116.80320323
+ 20
+21.5370144266
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-114.05320323
+ 20
+26.3001541475
+ 30
+-148.195
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-145.75
+ 20
+-10.0
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-140.25
+ 20
+-10.0
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-140.25
+ 20
+-8.00000000002
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-145.75
+ 20
+-8.00000000003
+ 30
+-148.195
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-114.05320323
+ 20
+-26.3001541474
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-116.80320323
+ 20
+-21.5370144266
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-118.535254038
+ 20
+-22.5370144266
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-115.785254038
+ 20
+-27.3001541474
+ 30
+-148.195
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-102.94679677
+ 20
+-13.5370144266
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-100.19679677
+ 20
+-18.3001541474
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-98.4647459621
+ 20
+-17.3001541474
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-101.214745962
+ 20
+-12.5370144266
+ 30
+-148.195
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-107.200961894
+ 20
+-19.168584287
+ 30
+-148.195
+ 42
+1.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-109.799038106
+ 20
+-20.668584287
+ 30
+-148.195
+ 42
+1.0
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-140.25
+ 20
+7.99999999998
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-140.25
+ 20
+9.99999999998
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-145.75
+ 20
+9.99999999997
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-145.75
+ 20
+7.99999999997
+ 30
+-148.195
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-110.401287383
+ 20
+9.38362906452
+ 30
+-148.195
+ 42
+-1.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-112.956062324
+ 20
+7.90862906451
+ 30
+-148.195
+ 42
+-1.0
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-128.256684161
+ 20
+3.12018489201
+ 30
+-148.195
+ 42
+-0.795387592263
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-114.785535031
+ 20
+7.23785652939
+ 30
+-148.195
+ 42
+-0.00785364423556
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-114.675103384
+ 20
+7.03945048473
+ 30
+-148.195
+ 42
+0.157459164324
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-113.169498538
+ 20
+5.59040578854
+ 30
+-148.195
+ 42
+-0.149420742177
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-110.078938371
+ 20
+2.70806974804
+ 30
+-148.195
+ 42
+-0.587869492188
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-116.566105359
+ 20
+-8.13122098424
+ 30
+-148.195
+ 42
+0.157459164324
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-118.5738173
+ 20
+-8.71059068056
+ 30
+-148.195
+ 42
+-0.808290376865
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-128.758791256
+ 20
+1.09177049952
+ 30
+-148.195
+ 42
+0.157459164324
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-121.043228289
+ 20
+-14.9587199469
+ 30
+-148.195
+ 42
+-0.131652497587
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-120.717465679
+ 20
+-15.2844825563
+ 30
+-148.195
+ 42
+-0.267949192431
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-120.717465679
+ 20
+-16.1744825563
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-122.077465679
+ 20
+-18.5300716546
+ 30
+-148.195
+ 42
+-0.414213562373
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-123.293228289
+ 20
+-18.855834264
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-134.683017338
+ 20
+-12.2799364906
+ 30
+-148.195
+ 42
+-0.414213562373
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-135.008779947
+ 20
+-11.0641738812
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-133.648779947
+ 20
+-8.70858478289
+ 30
+-148.195
+ 42
+-0.414213562373
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-132.433017338
+ 20
+-8.38282217352
+ 30
+-148.195
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-141.700961894
+ 20
+0.74999999998
+ 30
+-148.195
+ 42
+1.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-144.299038106
+ 20
+-0.750000000022
+ 30
+-148.195
+ 42
+1.0
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-102.94679677
+ 20
+13.5370144267
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-101.214745962
+ 20
+12.5370144267
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-98.4647459622
+ 20
+17.3001541475
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-100.19679677
+ 20
+18.3001541475
+ 30
+-148.195
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-131.691342951
+ 20
+8.24999999999
+ 30
+-148.195
+ 42
+-1.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-134.289419162
+ 20
+6.74999999999
+ 30
+-148.195
+ 42
+-1.0
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-115.395507689
+ 20
+-10.7920435026
+ 30
+-148.195
+ 42
+-1.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-117.95028263
+ 20
+-12.2670435026
+ 30
+-148.195
+ 42
+-1.0
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+POLYLINE
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 70
+1
+ 66
+1
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-102.913754373
+ 20
+7.46589777345
+ 30
+-148.195
+ 42
+-0.267949192431
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-102.142991764
+ 20
+7.02089777345
+ 30
+-148.195
+ 42
+-0.131652497587
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-102.023754373
+ 20
+6.57589777345
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-102.023754373
+ 20
+-6.57589777342
+ 30
+-148.195
+ 42
+-0.414213562373
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-102.913754373
+ 20
+-7.46589777342
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-105.633754373
+ 20
+-7.46589777342
+ 30
+-148.195
+ 42
+-0.414213562373
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-106.523754373
+ 20
+-6.57589777342
+ 30
+-148.195
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-106.523754373
+ 20
+6.57589777345
+ 30
+-148.195
+ 42
+-0.414213562373
+  0
+VERTEX
+  8
+Delta-slider-ball-sockets-hot-end
+ 10
+-105.633754373
+ 20
+7.46589777345
+ 30
+-148.195
+  0
+SEQEND
+  8
+Delta-slider-ball-sockets-hot-end
+  0
+ENDBLK
+  0
+ENDSEC
+  0
+SECTION
+  2
+ENTITIES
+  0
+INSERT
+  2
+PART__FEATURE121_CS
+  8
+Delta-slider-ball-sockets-hot-end
+ 62
+0
+ 10
+0.0
+ 20
+0.0
+ 30
+0.0
+  0
+ENDSEC
+  0
+EOF
