@@ -1,0 +1,8 @@
+import Part
+c=Part.BSplineCurve()
+from FreeCAD import Base
+pts=[Base.Vector(0,0,-280),Base.Vector(10,0,-270),Base.Vector(20,10,-230), Base.Vector(35,0,-250)]
+pts
+c.interpolate(pts)
+s=c.toShape()
+Part.show(s)
