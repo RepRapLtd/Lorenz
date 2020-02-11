@@ -1,0 +1,208 @@
+#
+# FreeCAD Python Macro to generate space frame components
+#
+# Adrian Bowyer
+# reprapltd.com
+#
+# 6 February 2020
+#
+# Licence: GPL
+#
+
+import Part, FreeCAD, math
+from FreeCAD import Base
+import math
+
+# User Parameters
+
+# The thicknesses of the spars
+
+sparThickness = 4
+
+# The width of the frame
+
+frameWidth = 40
+
+# The length of the frame
+
+frameLength = 250
+
+# Embed nuts in the screw holes?
+
+embeddedNuts = True
+
+# M3 clearance
+
+m3Radius = 1.7
+
+#M3 square nut cavity
+
+m3XY = 5.8
+m3Z = 2
+
+
+#********************************************************************************
+
+# Fixed and derived values
+
+clipLength = 7
+clipWidth = 2
+
+halfSparThickness = sparThickness/2
+halfFrameWidth = frameWidth/2
+halfClipWidth = clipWidth/2
+halfClipLength = clipLength/2
+
+shortenedFrameWidth = frameWidth - sparThickness
+
+#********************************************************************************
+
+# There must be an easier way to make the null set...
+
+def Null():
+ n1 = Part.makeBox(1, 1, 1)
+ n2 = Part.makeBox(1, 1, 1)
+ n2.translate(Base.Vector(10, 10, 10))
+ return(n1.common(n2))
+
+# Make a length of blank spar along the X axis with its base at Z=0 and the centre
+# of its end touching the Z axis
+
+def BlankSpar(length):
+ bs = Part.makeBox(length, sparThickness, sparThickness)
+ bs.translate(Base.Vector(0, -halfSparThickness, 0))
+ return bs
+
+# Make a spar between two points
+
+def Spar(p0, p1):
+ p = p1.sub(p0)
+ length = math.sqrt(p.x*p.x + p.y*p.y)
+ bs = BlankSpar(length)
+ angle = math.atan2(p.y, p.x)
+ bs.rotate(Base.Vector(0, 0, 0), Base.Vector(0, 0, 1), angle*180/math.pi)
+ bs.translate(p0)
+ return bs
+
+# M3 fastening at the point p and the hole in it
+
+def M3Fastening(p):
+ tab = Part.makeBox(m3XY*2, m3XY*2, sparThickness)
+ pt = p.add(Base.Vector(-m3XY, -m3XY, 0))
+ tab.translate(pt)
+ return tab
+
+def M3Hole(p):
+ hole = Part.makeCylinder(m3Radius, 3*sparThickness, p.sub(Base.Vector(0, 0, sparThickness)), Base.Vector(0, 0, 1))
+ if embeddedNuts:
+  nut = Part.makeBox(m3XY, m3XY, m3Z)
+  pt = p.add(Base.Vector(-m3XY/2, -m3XY/2, (sparThickness - m3Z)/2))
+  nut.translate(pt)
+  hole = hole.fuse(nut)
+ return hole
+
+
+
+# Clips
+
+def FemaleClip():
+ fc1 = Part.makeBox(clipLength, clipWidth, sparThickness)
+ fc1.translate(Base.Vector(0, -halfClipWidth - halfClipLength, 0))
+ fc2 = Part.makeBox(clipLength, clipWidth, sparThickness)
+ fc2.translate(Base.Vector(0, -halfClipWidth + halfClipLength, 0))
+ return fc1.fuse(fc2)
+
+def FemaleClipCut():
+ fcc = Part.makeBox(clipLength+2, clipLength, sparThickness+2)
+ fcc.translate(Base.Vector(0, - halfClipLength, -1))
+ return fcc
+
+def MaleClip():
+ fc1 = Part.makeBox(clipLength, clipWidth, sparThickness)
+ fc1.translate(Base.Vector(0, -halfClipWidth - halfClipLength, 0))
+ fc2 = Part.makeBox(clipLength, clipWidth, sparThickness)
+ fc2.translate(Base.Vector(0, -halfClipWidth + halfClipLength, 0))
+ return fc1.fuse(fc2)
+
+def MaleClipCut():
+ mcc = Part.makeBox(clipLength+2, clipLength, sparThickness+2)
+ mcc.translate(Base.Vector(0, - halfClipLength, -1))
+ return fcc
+
+# The 30 deg chamfer where the edges fit together
+
+def Chamfer30Cut():
+ halfAngle1 = Part.makeBox(frameLength+10, frameWidth, frameWidth)
+ halfAngle1.rotate(Base.Vector(0, 0, 0), Base.Vector(1, 0, 0), 30)
+ halfAngle1.translate(Base.Vector(-5, -halfFrameWidth, 0))
+ halfAngle2 = Part.makeBox(frameLength+10, frameWidth, frameWidth)
+ halfAngle2.rotate(Base.Vector(0, 0, 0), Base.Vector(1, 0, 0), 30)
+ halfAngle2.translate(Base.Vector(-5, -halfFrameWidth, 0))
+ halfAngle2 = halfAngle2.mirror(Base.Vector(0,0,0), Base.Vector(0,1,0))
+ return halfAngle1.fuse(halfAngle2)
+
+
+
+# Make a blank face
+
+def BlankFace():
+
+ # The outer rectangle
+
+ p0 = Base.Vector(halfSparThickness, -0.5*frameWidth, 0)
+ p1 = p0.add(Base.Vector(0, frameWidth, 0))
+ frame = Spar(p0, p1)
+ p0 = Base.Vector(0, 0.5*frameWidth - halfSparThickness, 0)
+ p1 = p0.add(Base.Vector(frameLength, 0, 0))
+ frame = frame.fuse(Spar(p0, p1))
+ p0 = Base.Vector(frameLength - halfSparThickness, 0.5*frameWidth, 0)
+ p1 = p0.add(Base.Vector(0, -frameWidth, 0))
+ frame = frame.fuse(Spar(p0, p1))
+ p0 = Base.Vector(frameLength, -0.5*frameWidth + halfSparThickness, 0)
+ p1 = p0.add(Base.Vector(-frameLength, 0, 0))
+ frame = frame.fuse(Spar(p0, p1))
+ 
+ # The inner triangles
+
+ p0 = Base.Vector(halfSparThickness, -0.5*frameWidth + halfSparThickness, 0)
+ pUp = Base.Vector(shortenedFrameWidth/math.sqrt(3), shortenedFrameWidth, 0)
+ pDown = Base.Vector(shortenedFrameWidth/math.sqrt(3), -shortenedFrameWidth, 0)
+ triangles = Null()
+
+ while p0.x < frameLength:
+  p1 = p0.add(pUp)
+  triangles = triangles.fuse(Spar(p0, p1))
+  p0 = p1
+  p1 = p0.add(pDown)
+  triangles = triangles.fuse(Spar(p0, p1))
+  p0 = p1
+
+ chop = Part.makeBox(frameLength + 10, 2*frameWidth + 10, sparThickness+10)
+ chop.translate(Base.Vector(frameLength - halfSparThickness, -frameWidth, -1))
+ triangles = triangles.cut(chop)
+
+ return frame.fuse(triangles)
+
+# All the clip cavities
+
+#def clipCuts():
+
+# All the clips
+
+#def clips():
+
+
+
+# Build the entire face
+
+def CompleteFace():
+ cf = BlankFace()
+ p = Base.Vector(20, 10, 0)
+ cf = cf.fuse(M3Fastening(p))
+ cf = cf.cut(M3Hole(p))
+ cf = cf.cut(Chamfer30Cut())
+ return cf
+
+
+Part.show(CompleteFace())
+

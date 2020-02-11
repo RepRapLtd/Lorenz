@@ -1,1 +1,0 @@
-triangular-strut.FCMacro
