@@ -145,61 +145,36 @@ def ScrewHole(p, square):
 
 # Clips
 
-def FemaleClip(p, down):
+def Clip(p, male):
  fc1 = Part.makeBox(clipWidth, clipLength, tabHeight)
- cut1 = Part.makeBox(clipLength*2, clipLength*2, tabHeight*2)
+ fc1.translate(Base.Vector(-halfClipWidth, 0, 0))
+ cut1 = Part.makeBox(clipLength*3, clipLength*3, tabHeight*3)
+ cut1.translate(Base.Vector(-clipLength*1.5, 0, 0))
  cut2 = cut1.copy()
  cut1.rotate(Base.Vector(0, 0, 0), Base.Vector(1, 0, 0), 30)
  cut1.translate(Base.Vector(0, 0, tab30LineHeight))
- fc = fc1.cut(cut1)
- p1 = Base.Vector(0, halfFrameWidth - r3*sparThickness, sparThickness)
- cut2.translate(p1)
- cut2.rotate(p1, Base.Vector(1, 0, 0), -60)
- fc = fc.cut(cut2)
- fc.translate(Base.Vector(-halfClipWidth, 0, 0))
- fc.translate(p)
- #fc2 = Part.makeBox(clipLength, clipWidth, sparThickness)
- #fc2.translate(Base.Vector(0, -halfClipWidth + halfClipLength, 0))
- #fc = fc1.fuse(fc2)
- #if down:
- # fc.rotate(Base.Vector(0, 0, 0), Base.Vector(0, 0, 1), -90)
- #else:
- # fc.rotate(Base.Vector(0, 0, 0), Base.Vector(0, 0, 1), 90)
-# fc.translate(p)
- return fc
-
-def FemaleClipCut(p, down):
- fcc = Part.makeBox(clipLength, clipLength + clipWidth + 2, sparThickness+2)
- fcc.translate(Base.Vector(0, - halfClipLength - halfClipWidth -1, -1))
- if down:
-  fcc.rotate(Base.Vector(0, 0, 0), Base.Vector(0, 0, 1), -90)
+ cut2.translate(Base.Vector(0, -clipLength*2, 0))
+ cut2.rotate(Base.Vector(0, 0, 0), Base.Vector(1, 0, 0), -60)
+ cut2.translate(Base.Vector(0, clipLength, sparThickness))
+ cut1 = cut1.fuse(cut2)
+ fc1 = fc1.cut(cut1)
+ fc1.translate(Base.Vector(0, halfFrameWidth - r3*sparThickness -clipLength, 0))
+ if male:
+  fc1.rotate(Base.Vector(0, 0, 0), Base.Vector(0, 0, 1), 180)
+ fc2 = fc1.copy()
+ if male:
+  xShift = clipWidth - clearance
  else:
-  fcc.rotate(Base.Vector(0, 0, 0), Base.Vector(0, 0, 1), 90)
- fcc.translate(p)
- return fcc
+  xShift = clipWidth*2 + clearance
+ fc1.translate(Base.Vector(-xShift, 0, 0))
+ fc2.translate(Base.Vector(xShift, 0, 0))
+ fc1 = fc1.fuse(fc2)
+ fc1.translate(p) 
+ return fc1
 
-def MaleClip(p, down):
- fc1 = Part.makeBox(clipLength, clipWidth, sparThickness)
- fc1.translate(Base.Vector(0, -halfClipWidth - halfClipLength, 0))
- fc2 = Part.makeBox(clipLength, clipWidth, sparThickness)
- fc2.translate(Base.Vector(0, -halfClipWidth + halfClipLength, 0))
- fc = fc1.fuse(fc2)
- if down:
-  fc.rotate(Base.Vector(0, 0, 0), Base.Vector(0, 0, 1), -90)
- else:
-  fc.rotate(Base.Vector(0, 0, 0), Base.Vector(0, 0, 1), 90)
- fc.translate(p)
- return fc
+def ClipCut(p, male):
+ return Null()
 
-def MaleClipCut(p, down):
- fcc = Part.makeBox(clipLength, clipLength + clipWidth + 2, sparThickness+2)
- fcc.translate(Base.Vector(0, - halfClipLength - halfClipWidth -1, -1))
- if down:
-  fcc.rotate(Base.Vector(0, 0, 0), Base.Vector(0, 0, 1), -90)
- else:
-  fcc.rotate(Base.Vector(0, 0, 0), Base.Vector(0, 0, 1), 90)
- fcc.translate(p)
- return fcc
 
 
 # The 30 degree chamfer where the edges fit together
@@ -344,13 +319,12 @@ def FrameFace():
  # Now the clips
 
  xCheck = frameLength - halfClipSpace + 1
- p0 = Base.Vector(halfClipSpace, halfFrameWidth - tabBackOff, 0)
+ p0 = Base.Vector(halfClipSpace, 0, 0)
  while p0.x < xCheck:
-  finalCuts = finalCuts.fuse(FemaleClipCut(p0, False))
-  fuseAfterFinalCut = fuseAfterFinalCut.fuse(FemaleClip(p0, False))
-  p1 = p0.add(Base.Vector(0, -frameWidth + sparThickness, 0))
-  finalCuts = finalCuts.fuse(MaleClipCut(p1, True))
-  fuseAfterFinalCut = fuseAfterFinalCut.fuse(MaleClip(p1, True))
+  finalCuts = finalCuts.fuse(ClipCut(p0, False))
+  fuseAfterFinalCut = fuseAfterFinalCut.fuse(Clip(p0, False))
+  finalCuts = finalCuts.fuse(ClipCut(p0, True))
+  fuseAfterFinalCut = fuseAfterFinalCut.fuse(Clip(p0, True))
   p0 = p0.add(Base.Vector(clipSpace, 0, 0))
 
  # finally cut away the chamfer allowing the frame to form into a triangle.
