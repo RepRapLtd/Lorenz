@@ -17,15 +17,15 @@ import math
 
 # The thicknesses of the spars
 
-sparThickness = 3
+sparThickness = 5
 
 # The width of the frame
 
-frameWidth = 30
+frameWidth = 40
 
 # The length of the frame
 
-frameLength = 90
+frameLength = 100
 
 # The space between clips.  The first clip is half this from the x=0 edge.
 
@@ -33,15 +33,19 @@ clipSpace = 30
 
 # Add screw holes?
 
-screwHoles = False
+screwHoles = True
 
 # Embed nuts in the screw holes?
 
 embeddedNuts = False
 
-# And in the corners?
+# Holes in the corners?
 
-embeddedNutsInCorners = True
+cornerHoles = True
+
+# Embedded nuts in the corners?
+
+embeddedNutsInCorners = False
 
 # The Y offset for the screw tabs from the centre
 
@@ -64,7 +68,6 @@ nutWalls = 2
 # Report useful facts about the structure
 
 report = True
-
 
 #********************************************************************************
 
@@ -89,7 +92,7 @@ tabBackOff = sparThickness*r3 + clipLength
 tabHeight = 2*tabBackOff
 tab30LineHeight = tabBackOff/r3
 
-#********************************************************************************
+#************************************************************************************
 
 # There must be an easier way to make the null set...
 
@@ -133,14 +136,19 @@ def ScrewFastening(p, square):
   tab.translate(p)
  return tab
 
-def ScrewHole(p, square):
- hole = Part.makeCylinder(screwRadius, 3*sparThickness, p.sub(Base.Vector(0, 0, sparThickness)), Base.Vector(0, 0, 1))
+def ScrewHole(p, square, angle):
+ hole = Part.makeCylinder(screwRadius, 3*sparThickness, Base.Vector(0, 0, -sparThickness), Base.Vector(0, 0, 1))
+ if p.y > 0:
+  angle = -angle
+ hole.rotate(Base.Vector(0, 0, 0), Base.Vector(1, 0, 0), angle)
+ hole.translate(p)
+ hCopy = hole.copy()
  if square:
   nut = Part.makeBox(nutXY, nutXY, nutZ)
   pt = p.add(Base.Vector(-nutXY/2, -nutXY/2, (sparThickness - nutZ)/2))
   nut.translate(pt)
   hole = hole.fuse(nut)
- return hole
+ return hCopy, hole
 
 
 # Clips
@@ -200,6 +208,7 @@ def FrameFace():
  triangles = Null()
  finalCuts = Null()
  fuseAfterFinalCut = Null()
+ allHoles = Null()
 
  # The outer rectangle
 
@@ -263,7 +272,10 @@ def FrameFace():
    oldUpX = tab.x
    if tab.x < xCheck:
     triangles = triangles.fuse(ScrewFastening(tab, embeddedNuts))
-    finalCuts = finalCuts.fuse(ScrewHole(tab, embeddedNuts))
+    hole, hNut = ScrewHole(tab, embeddedNuts, 0)
+    allHoles = allHoles.fuse(hole)
+    finalCuts = finalCuts.fuse(hNut)
+
 
   # The actual triangle leg
 
@@ -285,7 +297,9 @@ def FrameFace():
    oldDownX = tab.x
    if tab.x < xCheck:
     triangles = triangles.fuse(ScrewFastening(tab, embeddedNuts))
-    finalCuts = finalCuts.fuse(ScrewHole(tab, embeddedNuts))
+    hole, hNut = ScrewHole(tab, embeddedNuts, 0)
+    allHoles = allHoles.fuse(hole)
+    finalCuts = finalCuts.fuse(hNut)
 
   triangles = triangles.fuse(Spar(p0, p1))
 
@@ -302,19 +316,28 @@ def FrameFace():
 
  # Maybe add fastenings in the corners
 
- if embeddedNutsInCorners:
-   corner = Base.Vector(nutXY + nutWalls, 1 + nutXY + nutWalls - halfFrameWidth, 0)
+ if cornerHoles:
+   offset = nutXY + nutWalls - halfFrameWidth
+   corner = Base.Vector(nutXY + nutWalls, offset, 0)
    frame = frame.fuse(ScrewFastening(corner, True))
-   finalCuts = finalCuts.fuse(ScrewHole(corner, True))
-   corner = Base.Vector(frameLength - nutXY - nutWalls, 1 + nutXY + nutWalls - halfFrameWidth, 0)
+   hole, hNut = ScrewHole(corner, embeddedNutsInCorners, 30)
+   allHoles = allHoles.fuse(hole)
+   finalCuts = finalCuts.fuse(hNut)
+   corner = Base.Vector(frameLength - nutXY - nutWalls, offset, 0)
    frame = frame.fuse(ScrewFastening(corner, True))
-   finalCuts = finalCuts.fuse(ScrewHole(corner, True))
-   corner = Base.Vector(frameLength - nutXY - nutWalls, halfFrameWidth - nutXY - nutWalls - 1, 0)
+   hole, hNut = ScrewHole(corner, embeddedNutsInCorners, 30)
+   allHoles = allHoles.fuse(hole)
+   finalCuts = finalCuts.fuse(hNut)
+   corner = Base.Vector(frameLength - nutXY - nutWalls, -offset, 0)
    frame = frame.fuse(ScrewFastening(corner, True))
-   finalCuts = finalCuts.fuse(ScrewHole(corner, True))
-   corner = Base.Vector(nutXY + nutWalls, halfFrameWidth - nutXY - nutWalls - 1, 0)
+   hole, hNut = ScrewHole(corner, embeddedNutsInCorners, 30)
+   allHoles = allHoles.fuse(hole)
+   finalCuts = finalCuts.fuse(hNut)
+   corner = Base.Vector(nutXY + nutWalls, -offset, 0)
    frame = frame.fuse(ScrewFastening(corner, True))
-   finalCuts = finalCuts.fuse(ScrewHole(corner, True))
+   hole, hNut = ScrewHole(corner, embeddedNutsInCorners, 30)
+   allHoles = allHoles.fuse(hole)
+   finalCuts = finalCuts.fuse(hNut)
 
  # Now the clips
 
@@ -332,10 +355,11 @@ def FrameFace():
  finalCuts = finalCuts.fuse(Chamfer30Cut())
  frame = frame.cut(finalCuts)
  frame = frame.fuse(fuseAfterFinalCut)
-
+ Part.show(allHoles)
+ Part.show(frame)
  return frame
 
 
+FrameFace()
 
-Part.show(FrameFace())
 
