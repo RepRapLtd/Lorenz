@@ -1,8 +1,7 @@
 # Lorenz
-
 Delta RepRap
 
-This is a delta RepRap design named after Konrad Lorenz.
+This is a delta RepRap design named for Konrad Lorenz.
 
 See also the RepRap Lorenz Facebook group:
 
